@@ -10,5 +10,7 @@ router.post(
   validateRequest(MemberValidations.createMemberValidationSchema),
   MemberController.createMember
 );
+router.get("/", MemberController.getAllMembers);
+router.get("/:memberId", MemberController.getMemberById);
 
 export const MemberRoutes = router;
