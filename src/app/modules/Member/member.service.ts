@@ -24,8 +24,31 @@ const getMemberById = async (memberId: string) => {
   return result;
 };
 
+const updateMember = async (memberId: string, payload: Partial<Member>) => {
+    const result = await prisma.member.update({
+        where: {
+            memberId
+        },
+        data: payload
+    });
+
+    return result;
+}
+
+const deleteMember = async (memberId: string) => {
+    const result = await prisma.member.delete({
+        where: {
+            memberId
+        },
+    });
+
+    return result;
+}
+
 export const MemberServices = {
   createMember,
   getAllMembers,
   getMemberById,
+  updateMember,
+  deleteMember
 };

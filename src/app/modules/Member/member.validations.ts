@@ -10,6 +10,15 @@ const createMemberValidationSchema = z.object({
     })
 });
 
+const updateMemberValidationSchema = z.object({
+    body: z.object({
+        name: z.string().optional(),
+        email: z.string().optional(),
+        phone: z.string().optional(),
+    })
+});
+
 export const MemberValidations = {
-    createMemberValidationSchema
+    createMemberValidationSchema,
+    updateMemberValidationSchema
 }
