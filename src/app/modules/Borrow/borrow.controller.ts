@@ -6,7 +6,6 @@ import { BorrowServices } from "./borrow.service";
 
 const createBorrowBook = catchAsync(async(req, res) => {
     const result = await BorrowServices.createBorrowBook(req.body);
-    console.log(result);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -16,6 +15,18 @@ const createBorrowBook = catchAsync(async(req, res) => {
     })
 });
 
+const checkOverdueRecords = catchAsync(async(req, res) => {
+    const result = await BorrowServices.checkOverdueRecords();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: result.length > 0 ? "Overdue borrow list fetched" : "No overdue books",
+        data: result,
+    })
+});
+
 export const BorrowController = {
-    createBorrowBook
+    createBorrowBook,
+    checkOverdueRecords
 }
