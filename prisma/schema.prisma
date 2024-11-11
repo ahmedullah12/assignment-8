@@ -25,15 +25,6 @@ model Book {
   @@map("books")
 }
 
-model Author {
-  authorId    String   @id @default(uuid())
-  name        String
-  bio         String   @db.Text
-  dateOfBirth DateTime
-
-  @@map("authors")
-}
-
 model Member {
   memberId       String         @id @default(uuid())
   name           String
@@ -47,10 +38,10 @@ model Member {
 
 model BorrowRecord {
   borrowId   String    @id @default(uuid())
-  borrowDate DateTime
-  returnDate DateTime?
   bookId     String
   memberId   String
+  borrowDate DateTime  @default(now())
+  returnDate DateTime?
 
   book   Book   @relation(fields: [bookId], references: [bookId])
   member Member @relation(fields: [memberId], references: [memberId])

@@ -11,16 +11,6 @@ CREATE TABLE "books" (
 );
 
 -- CreateTable
-CREATE TABLE "authors" (
-    "authorId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "bio" TEXT NOT NULL,
-    "dateOfBirth" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "authors_pkey" PRIMARY KEY ("authorId")
-);
-
--- CreateTable
 CREATE TABLE "members" (
     "memberId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
