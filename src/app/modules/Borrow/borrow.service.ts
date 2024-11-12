@@ -1,11 +1,16 @@
+import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
+import AppError from "../../error/AppError";
 
+
+//creating borrow record
 const createBorrowBook = async (payload: {
   bookId: string;
   memberId: string;
 }) => {
   const result = await prisma.$transaction(async (transactionClient) => {
-    const book = await transactionClient.book.findUniqueOrThrow({
+    //getting the book data
+    const book = await transactionClient.book.findUnique({
       where: {
         bookId: payload.bookId,
       },
@@ -14,6 +19,11 @@ const createBorrowBook = async (payload: {
       },
     });
 
+    if(!book){
+      throw new AppError(httpStatus.NOT_FOUND, "Book not found!")
+    }
+
+    //creating borrow data with transaction
     const createBorrowData = await transactionClient.borrowRecord.create({
       data: {
         bookId: payload.bookId,
@@ -42,11 +52,13 @@ const createBorrowBook = async (payload: {
   return result;
 };
 
+//checking the overdue records
 const checkOverdueRecords = async () => {
   const fourteenDaysAgo = new Date();
   fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
 
-  const overdueBooks = await prisma.borrowRecord.findMany({
+  //getting the overdue borrow records
+  const overdueRecords = await prisma.borrowRecord.findMany({
     where: {
       borrowDate: {
         lt: fourteenDaysAgo,
@@ -70,7 +82,7 @@ const checkOverdueRecords = async () => {
   });
 
   // Format the data to include overdueDays
-  const formattedData = overdueBooks.map((record) => {
+  const formattedData = overdueRecords.map((record) => {
     const today = new Date();
     const overdueDays = Math.floor(
       (today.getTime() - new Date(record.borrowDate).getTime()) / (1000 * 60 * 60 * 24) - 14
