@@ -46,3 +46,9 @@ to run the application using ts-node-dev
    ```
 
 ## Key Features and Functionalities
+- Can create books and get the book data. Also can update or delete a book.
+- Also it member creation functionalities and manage their data.
+- Members can borrow books and have to return within 14 days.
+- Member can return the book easily.
+- Can check overdue borrow records if they don't return within due date.
+- Errors handled very nicely.

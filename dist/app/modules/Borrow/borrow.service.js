@@ -13,10 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BorrowServices = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
+const AppError_1 = __importDefault(require("../../error/AppError"));
+//creating borrow record
 const createBorrowBook = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
-        const book = yield transactionClient.book.findUniqueOrThrow({
+        //getting the book data
+        const book = yield transactionClient.book.findUnique({
             where: {
                 bookId: payload.bookId,
             },
@@ -24,6 +28,10 @@ const createBorrowBook = (payload) => __awaiter(void 0, void 0, void 0, function
                 availableCopies: true,
             },
         });
+        if (!book) {
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Book not found!");
+        }
+        //creating borrow data with transaction
         const createBorrowData = yield transactionClient.borrowRecord.create({
             data: {
                 bookId: payload.bookId,
@@ -48,10 +56,12 @@ const createBorrowBook = (payload) => __awaiter(void 0, void 0, void 0, function
     }));
     return result;
 });
+//checking the overdue records
 const checkOverdueRecords = () => __awaiter(void 0, void 0, void 0, function* () {
     const fourteenDaysAgo = new Date();
     fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
-    const overdueBooks = yield prisma_1.default.borrowRecord.findMany({
+    //getting the overdue borrow records
+    const overdueRecords = yield prisma_1.default.borrowRecord.findMany({
         where: {
             borrowDate: {
                 lt: fourteenDaysAgo,
@@ -74,7 +84,7 @@ const checkOverdueRecords = () => __awaiter(void 0, void 0, void 0, function* ()
         },
     });
     // Format the data to include overdueDays
-    const formattedData = overdueBooks.map((record) => {
+    const formattedData = overdueRecords.map((record) => {
         const today = new Date();
         const overdueDays = Math.floor((today.getTime() - new Date(record.borrowDate).getTime()) / (1000 * 60 * 60 * 24) - 14);
         return {

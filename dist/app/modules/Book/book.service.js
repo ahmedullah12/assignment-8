@@ -14,24 +14,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookServices = void 0;
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
+const AppError_1 = __importDefault(require("../../error/AppError"));
+const http_status_1 = __importDefault(require("http-status"));
+//creating a book
 const createBook = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.book.create({
         data: payload,
     });
     return result;
 });
+//getting all the books
 const getAllBooks = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.book.findMany();
     return result;
 });
+//getting the book by id
 const getBookById = (bookId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.book.findUniqueOrThrow({
+    const book = yield prisma_1.default.book.findUnique({
         where: {
             bookId,
         },
     });
-    return result;
+    if (!book) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Book not found!");
+    }
+    return book;
 });
+//updating the book
 const updateBook = (bookId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.book.update({
         where: {
@@ -39,14 +48,21 @@ const updateBook = (bookId, payload) => __awaiter(void 0, void 0, void 0, functi
         },
         data: payload
     });
+    if (!result) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Error updating the book");
+    }
     return result;
 });
+//deleting the book
 const deleteBook = (bookId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.book.delete({
         where: {
             bookId
         },
     });
+    if (!result) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Book not found!");
+    }
     return result;
 });
 exports.BookServices = {

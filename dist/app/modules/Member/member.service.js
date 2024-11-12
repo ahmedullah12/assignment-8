@@ -14,24 +14,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MemberServices = void 0;
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
+const http_status_1 = __importDefault(require("http-status"));
+const AppError_1 = __importDefault(require("../../error/AppError"));
+//creating a member
 const createMember = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.member.create({
         data: payload,
     });
     return result;
 });
+//getting all the members
 const getAllMembers = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.member.findMany();
     return result;
 });
+//getting the member by id
 const getMemberById = (memberId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.member.findUniqueOrThrow({
+    const member = yield prisma_1.default.member.findUnique({
         where: {
             memberId,
         },
     });
-    return result;
+    if (!member) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Member not found!");
+    }
+    return member;
 });
+//updating the member
 const updateMember = (memberId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.member.update({
         where: {
@@ -39,14 +48,21 @@ const updateMember = (memberId, payload) => __awaiter(void 0, void 0, void 0, fu
         },
         data: payload
     });
+    if (!result) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Error updating the member!");
+    }
     return result;
 });
+//deleting the member
 const deleteMember = (memberId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.member.delete({
         where: {
             memberId
         },
     });
+    if (!result) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Member not found!");
+    }
     return result;
 });
 exports.MemberServices = {
